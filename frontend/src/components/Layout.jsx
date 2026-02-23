@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Book, Users, ClipboardList } from 'lucide-react';
+import { Home, Book, Users, ClipboardList, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import './Layout.css';
 
 const Layout = ({ children }) => {
     const location = useLocation();
+    const { logout } = useAuth();
 
     const navItems = [
         { path: '/', icon: Home, label: 'Dashboard' },
@@ -34,6 +36,14 @@ const Layout = ({ children }) => {
                             </Link>
                         );
                     })}
+                    <button
+                        onClick={logout}
+                        className="nav-item"
+                        style={{ marginTop: 'auto', width: '100%', textAlign: 'left' }}
+                    >
+                        <LogOut size={20} />
+                        <span>Sign Out</span>
+                    </button>
                 </nav>
             </aside>
             <main className="main-content">

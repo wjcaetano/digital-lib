@@ -9,13 +9,22 @@ export const api = axios.create({
     },
 });
 
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            if (window.location.pathname !== '/login') {
+                localStorage.removeItem('@DigitalLib:token');
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const BookService = {
     getBooks: async (skip = 0, limit = 100) => {
         const response = await api.get(`/books/?skip=${skip}&limit=${limit}`);
-        return response.data;
-    },
-    createBook: async (data) => {
-        const response = await api.post('/books/', data);
         return response.data;
     },
     getAuthors: async (skip = 0, limit = 100) => {
@@ -24,6 +33,10 @@ export const BookService = {
     },
     createAuthor: async (data) => {
         const response = await api.post('/books/authors/', data);
+        return response.data;
+    },
+    createBook: async (data) => {
+        const response = await api.post('/books/', data);
         return response.data;
     },
 };
