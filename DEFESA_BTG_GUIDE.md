@@ -56,11 +56,17 @@ This is how you get the job. BTG loves candidates aiming for "Production Grade".
 6.  **Automated Testing (Intermediate ✅):**
     *   *Your pitch:* "Pushed a containerized test suite via Pytest hitting flows End-to-End (E2E), generating string instances out of UUID4 to avoid database constraint congestion and enforcing integrity validation independently."
 
-7.  **Isolation, Security, and AppSec Deploy (Hidden Mastery 💎):**
+7.  **Authentication & Security (Hidden Mastery 💎):**
     *   *Your pitches:*
         *   "On serious environments, secrets are shielded by `.env`. The repository packs a clean `.gitignore` to prevent secret leaking."
         *   "Our password payloads run encrypted inside our DB rows via state-of-the-art *Bcrypt* hashing, protecting users proactively against Rainbow Table attacks."
+        *   "I implemented a fully independent **JWT (JSON Web Token)** layer. Endpoints that mutate data require a valid `Bearer` token inside the Auth Header. If a token expires or is tampered with, the backend blocks it with a 401/403 HTTP Exception."
         *   "The system bounds requests originating out of untrusted sites thanks to active *CORS* middleware blocking implemented natively."
+
+8.  **Fullstack Containerization & Web Server Proxy (Advanced ✅):**
+    *   *Your pitches:*
+        *   "I didn't stop at the API. I built a complete **React (Vite) Front-end Application** featuring global Auth Contexts and Axios Interceptors to elegantly consume our FastAPI backend."
+        *   "For the deploy architecture, the React app isn't just running a dev server. I created a multi-stage `Dockerfile` that compiles the React Node.js build into static assets and serves them via a hyper-fast **Nginx** Alpine container."
 
 ---
 

@@ -7,6 +7,8 @@ An elegant and performant RESTful API built with FastAPI and asynchronous Python
 The application handles 3 core entities (`User`, `Book`, `Loan`) managed through CRUD operations packed with complex business rules.
 
 ### Business Rules & Highlights:
+- **Authentication**: JWT (JSON Web Tokens) protecting all mutable endpoints (`/login`).
+- **Fullstack React SPA**: A premium dark-themed React frontend built with Vite and pure CSS glassmorphism, fully containerized in Nginx.
 - **Loan Limits**: Maximum of 3 active loans per user.
 - **Duration**: 14 days deadline for returns.
 - **Late Fee**: R$ 2.00 per late day, calculated automatically.
@@ -18,11 +20,13 @@ The application handles 3 core entities (`User`, `Book`, `Loan`) managed through
 
 ## Technologies & Architecture
 - **FastAPI**: Backend REST Framework (`python-multipart`, `pydantic`).
+- **React + Vite**: Frontend SPA with `lucide-react` icons and custom `index.css`.
 - **PostgreSQL**: Data persistence managed through Docker.
 - **SQLAlchemy (ORM) + Alembic**: DB Abstraction and Schema Migrations.
 - **Redis**: Key-Value store for caching on the API layer.
-- **Bcrypt**: Secure password hashing.
-- **Docker Compose**: Multi-container orchestration.
+- **PyJWT & Bcrypt**: Secure token generation and password hashing.
+- **Nginx**: Lightweight web server to serve the React production build.
+- **Docker Compose**: Multi-container orchestration (4 Services).
 - **Pytest**: Feature validation and Testing Suite.
 
 ## Installation and Execution Instructions
@@ -53,8 +57,10 @@ The application handles 3 core entities (`User`, `Book`, `Loan`) managed through
    docker-compose run --rm web alembic upgrade head
    ```
 
-5. **Access the Documentation (Swagger)**:
-   Open in your browser: `http://localhost:8000/docs`
+5. **Access the Application**:
+   - **Frontend (React SPA)**: Open `http://localhost:5173/` in your browser.
+     *To use the application, you must first create a user via the Swagger API.*
+   - **Backend Documentation (Swagger)**: Open `http://localhost:8000/docs`.
 
 ## Running Tests (QA - Internal Validation)
 You can run all the application tests by executing:
@@ -68,11 +74,12 @@ All Data Models (`Schemas`) can be interactively validated on the `/docs` web in
 
 | Feature | Endpoint | Method | Description |
 | --- | --- | --- | --- |
+| Authenticate | `/login` | POST | Receives `username` and `password`, returns Bearer JWT |
 | Create User | `/users/` | POST | Requires `name`, `email` and `password` |
-| Create Book | `/books/` | POST | Requires `title`, `author_id` (Requires pre-existing Author) |
+| Create Book | `/books/` | POST | **[Requires Auth]** Requires `title`, `author_id` (Requires pre-existing Author) |
 | List Books | `/books/?skip=0&limit=10` | GET | Paginated and Cached list! |
-| Perform Loan | `/loans/` | POST | Payload: `{"user_id": 1, "book_id": 1}`. Validates availability and loan quota. |
-| Return Book | `/loans/{loan_id}/return` | POST | Validates fines and releases the book to the library pool |
+| Perform Loan | `/loans/` | POST | **[Requires Auth]** Payload: `{"user_id": 1, "book_id": 1}`. Validates availability and loan quota. |
+| Return Book | `/loans/{loan_id}/return` | POST | **[Requires Auth]** Validates fines and releases the book to the library pool |
 
 ### Postman Collection
 At the project root, you'll find the **`Digital_Library_API.postman_collection.json`** file.
