@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from app.domain.dtos.loan import LoanCreate, LoanResponse, ReturnResponse
+from app.domain.dtos.loan import LoanCreate, LoanResponse
 from app.api.dependencies import get_db, get_current_user
 from app.services.loan_service import loan_service
 from app.domain.entities.user import User
@@ -26,7 +26,7 @@ def create_loan(
     """
     return loan_service.create_loan(db=db, loan=loan)
 
-@router.post("/{loan_id}/return", response_model=ReturnResponse)
+@router.post("/{loan_id}/return", response_model=LoanResponse)
 @limiter.limit("5/minute")
 def return_loan(
     request: Request, 

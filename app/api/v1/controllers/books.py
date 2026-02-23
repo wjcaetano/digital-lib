@@ -1,5 +1,5 @@
-from typing import List
-from typing import List
+from typing import List, Optional
+import redis
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
