@@ -1,79 +1,79 @@
 # Digital Library API
 
-Sistema de Gerenciamento de uma Biblioteca Digital Moderna. 
-Uma API RESTful elegante e perfomática desenvolvida em FastAPI e stack Python assíncrona.
+Modern Digital Library Management System.
+An elegant and performant RESTful API built with FastAPI and asynchronous Python stack.
 
-## Visão Geral das Funcionalidades
-A aplicação possui 3 entidades principais (`Usuário`, `Livro`, `Empréstimo`) gerenciadas através de operações CRUD com regras de negócios complexas.
+## Feature Overview
+The application handles 3 core entities (`User`, `Book`, `Loan`) managed through CRUD operations packed with complex business rules.
 
-### Regras de Negócio e Diferenciais:
-- **Limite de Empréstimos**: Máximo de 3 ativos por usuário.
-- **Duração**: Prazo de 14 dias para devolução.
-- **Multa**: R$ 2,00 por dia de atraso calculado automaticamente.
-- **Cache (Redis)**: Endpoints de listagem de livros armazenados em cache para performance.
-- **Rate Limit**: Prevenção contra abusos via SlowAPI (ex. `10 requisições/minuto` para a listagem principal).
-- **Log Estruturado**: Interceptor customizado para monitoramento das chamadas da API.
-- **Documentação Nativa**: Swagger OpenAPI acessível diretamente no Browser.
-- **Testes Automatizados**: Suíte de testes integrados e validadores Pydantic rigorosos.
+### Business Rules & Highlights:
+- **Loan Limits**: Maximum of 3 active loans per user.
+- **Duration**: 14 days deadline for returns.
+- **Late Fee**: R$ 2.00 per late day, calculated automatically.
+- **Cache (Redis)**: Book list endpoints are cached for high performance.
+- **Rate Limit**: Preventing abuse using SlowAPI (e.g., `10 requests/minute` for main listing).
+- **Structured Logging**: Custom interceptor for API call monitoring.
+- **Native Documentation**: Swagger OpenAPI interface accessible directly in the browser.
+- **Automated Testing**: Integrated test suite backed by strict Pydantic validators.
 
-## Tecnologias e Arquitetura Recomendada
+## Technologies & Architecture
 - **FastAPI**: Backend REST Framework (`python-multipart`, `pydantic`).
-- **PostgreSQL**: Persistência de dados através do docker.
-- **SQLAlchemy (ORM) + Alembic**: Abstração do BD e Migrações (Versionamento de Esquema).
-- **Redis**: Chave/Valor para Cacheamento na camada de API.
-- **Bcrypt**: Hashing de senhas seguro.
-- **Docker Compose**: Orquestração multi-contêiner.
-- **Pytest**: Validação e Suíte de Testes.
+- **PostgreSQL**: Data persistence managed through Docker.
+- **SQLAlchemy (ORM) + Alembic**: DB Abstraction and Schema Migrations.
+- **Redis**: Key-Value store for caching on the API layer.
+- **Bcrypt**: Secure password hashing.
+- **Docker Compose**: Multi-container orchestration.
+- **Pytest**: Feature validation and Testing Suite.
 
-## Instruções de Instalação e Execução
+## Installation and Execution Instructions
 
-### Pré-requisitos
-- Ter o **Docker** e o **Docker Compose** instalados na sua máquina.
-- Conexão e porta liberada `8000` (API), `5432` (Postgres) e `6379` (Redis).
+### Prerequisites
+- Have **Docker** and **Docker Compose** installed on your machine.
+- Free ports `8000` (API), `5432` (Postgres) and `6379` (Redis).
 
-### Passos:
-1. Faça o clone do projeto (ou copie a estrutura para seu path de execução).
-2. **Configure as Variáveis de Ambiente (`.env`)**
-   O projeto utiliza um arquivo `.env` para separar as configurações de **Desenvolvimento** e **Produção**.
-   Copie o arquivo de exemplo:
+### Steps:
+1. Clone the repository (or copy the project structure to your path).
+2. **Configure Environment Variables (`.env`)**
+   The project uses a `.env` file to separate **Development** and **Production** variables.
+   Copy the example file:
    ```bash
    cp .env.example .env
    ```
-   *(Edite o arquivo `.env` com senhas fortes para produção. Em dev, os valores padrão conectam diretamente com o Docker).*
+   *(Edit the `.env` file with strong passwords for production. In dev, default values connect out-of-the-box with Docker).*
 
-3. Na raiz onde localiza-se o arquivo `docker-compose.yml`, rode o seguinte comando:
+3. At the root, where the `docker-compose.yml` file is located, run the following command:
    ```bash
    docker-compose up -d --build
    ```
-   *Isso irá ler o arquivo `.env`, construir a imagem Python, baixar e ligar o PostgreSQL e o Redis.*
+   *This reads the `.env` file, builds the Python image, downloads and links PostgreSQL and Redis.*
 
-3. **Iniciando e Rodando as Migrations**:
-   Para criar as tabelas do Banco de Dados automaticamente, rode o Alembic dentro do container web:
+4. **Running Initial Migrations**:
+   To safely scaffold the database tables, run Alembic inside the web container:
    ```bash
    docker-compose run --rm web alembic upgrade head
    ```
 
-4. **Acesse a Documentação (Swagger)**:
-   Abra no seu navegador: `http://localhost:8000/docs`
+5. **Access the Documentation (Swagger)**:
+   Open in your browser: `http://localhost:8000/docs`
 
-## Rodando Testes (QA - Validação Interna)
-Você pode executar todos os testes da aplicação rodando:
+## Running Tests (QA - Internal Validation)
+You can run all the application tests by executing:
 ```bash
 docker-compose run --rm web pytest tests/ -v
 ```
 
-## Exemplos de Uso da API
+## API Usage Examples
 
-Todos os Modelos (`Schemas`) podem ser validados interativamente na interface web `/docs`, entretanto, você pode utilizar `curl` ou um client HTTP (Ex. Insomnia/Postman) para invocar as rotas sob o prefixo: `http://localhost:8000/api/v1/`
+All Data Models (`Schemas`) can be interactively validated on the `/docs` web interface, however, you can use `curl` or any HTTP client (e.g., Insomnia/Postman) to request the routes under the prefix: `http://localhost:8000/api/v1/`
 
-| Funcionalidade | Endpoint | Método | Descrição |
+| Feature | Endpoint | Method | Description |
 | --- | --- | --- | --- |
-| Criar Usuário | `/users/` | POST | Exige `name`, `email` e `password` |
-| Criar Livro | `/books/` | POST | Exige `title`, `author_id` (Criação vinculada prévia da rota Author) |
-| Listar Livros | `/books/?skip=0&limit=10` | GET | Listagem Paginada e Cacheada! |
-| Realizar Empréstimo | `/loans/` | POST | Payload: `{"user_id": 1, "book_id": 1}`. Valida se livro está disponível e usuário não atingiu cota de 3 empréstimos |
-| Devolver Livro | `/loans/{loan_id}/return` | POST | Valida multa e libera o livro novamente no acervo |
+| Create User | `/users/` | POST | Requires `name`, `email` and `password` |
+| Create Book | `/books/` | POST | Requires `title`, `author_id` (Requires pre-existing Author) |
+| List Books | `/books/?skip=0&limit=10` | GET | Paginated and Cached list! |
+| Perform Loan | `/loans/` | POST | Payload: `{"user_id": 1, "book_id": 1}`. Validates availability and loan quota. |
+| Return Book | `/loans/{loan_id}/return` | POST | Validates fines and releases the book to the library pool |
 
-### Coleção do Postman
-Na raiz do projeto existe o arquivo **`Digital_Library_API.postman_collection.json`**.
-Você pode importar este arquivo em seu [Postman](https://www.postman.com/) ou [Insomnia](https://insomnia.rest/) para testar rapidamente todas as rotas listadas acima. A coleção já inclui a variável de ambiente nativa `{{base_url}}` apontando para `http://localhost:8000`.
+### Postman Collection
+At the project root, you'll find the **`Digital_Library_API.postman_collection.json`** file.
+You can import this file into [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) to quickly test all listed routes. The collection natively packs the `{{base_url}}` environment variable pointing to `http://localhost:8000`.

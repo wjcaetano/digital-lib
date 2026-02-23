@@ -16,7 +16,7 @@ router = APIRouter()
 @limiter.limit("5/minute")
 def create_user(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     """
-    Cadastra um novo usuário.
+    Registers a new user.
     """
     return user_service.create_user(db=db, user=user)
 
@@ -24,7 +24,7 @@ def create_user(request: Request, user: UserCreate, db: Session = Depends(get_db
 @limiter.limit("20/minute")
 def read_users(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
-    Lista todos os usuários com paginação.
+    Lists all users with pagination.
     """
     return user_service.get_users(db, skip=skip, limit=limit)
 
@@ -32,7 +32,7 @@ def read_users(request: Request, skip: int = 0, limit: int = 10, db: Session = D
 @limiter.limit("30/minute")
 def read_user(request: Request, user_id: int, db: Session = Depends(get_db)):
     """
-    Busca um usuário por ID.
+    Fetches a user by ID.
     """
     user = user_service.get_user(db, user_id=user_id)
     if user is None:
@@ -43,7 +43,7 @@ def read_user(request: Request, user_id: int, db: Session = Depends(get_db)):
 @limiter.limit("30/minute")
 def read_user_loans(request: Request, user_id: int, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
-    Lista todos os empréstimos (histórico) associados a um usuário.
+    Lists all loans (history) associated with a user.
     """
     user = user_service.get_user(db, user_id=user_id)
     if user is None:

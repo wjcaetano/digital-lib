@@ -11,7 +11,7 @@ from app.repositories.user_repository import user_repository
 
 class LoanService:
     MAX_ACTIVE_LOANS = 3
-    LATE_FEE_PER_DAY = 2.0  # R$ 2,00 por dia
+    LATE_FEE_PER_DAY = 2.0  # R$ 2.00 per day
 
     def get_loans(self, db: Session, skip: int = 0, limit: int = 100) -> List[Loan]:
         return loan_repository.get_multi(db, skip=skip, limit=limit)

@@ -14,7 +14,7 @@ router = APIRouter()
 @limiter.limit("10/minute")
 def create_author(request: Request, author: AuthorCreate, db: Session = Depends(get_db)):
     """
-    Cadastra um novo autor.
+    Registers a new author.
     """
     # Create a local service instance without Redis requirement for authors
     service = BookService()
@@ -24,7 +24,7 @@ def create_author(request: Request, author: AuthorCreate, db: Session = Depends(
 @limiter.limit("30/minute")
 def read_authors(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
-    Lista autores com paginação.
+    Lists authors with pagination.
     """
     service = BookService()
     return service.get_authors(db, skip=skip, limit=limit)
@@ -33,7 +33,7 @@ def read_authors(request: Request, skip: int = 0, limit: int = 10, db: Session =
 @limiter.limit("10/minute")
 def create_book(request: Request, book: BookCreate, db: Session = Depends(get_db), redis_client = Depends(get_redis_client)):
     """
-    Cadastra um novo livro vinculado a um autor existente. LIMPA O CACHE de leitura de livros.
+    Registers a new book linked to an existing author. CLEARS the book list CACHE.
     """
     service = BookService(redis_client=redis_client)
     return service.create_book(db=db, book=book)
@@ -42,8 +42,8 @@ def create_book(request: Request, book: BookCreate, db: Session = Depends(get_db
 @limiter.limit("60/minute")
 def read_books(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db), redis_client = Depends(get_redis_client)):
     """
-    Lista livros com paginação.
-    Tenta primeiramente obter via Cache (Redis), caso não haja, fará a request para o Banco e subirá pro Cache por 1 hr.
+    Lists books with pagination.
+    Attempts to fetch via Cache (Redis) first. If absent, requests from DB and sets Cache for 1 hr.
     """
     service = BookService(redis_client=redis_client)
     return service.get_books(db, skip=skip, limit=limit)
@@ -52,7 +52,7 @@ def read_books(request: Request, skip: int = 0, limit: int = 10, db: Session = D
 @limiter.limit("60/minute")
 def check_availability(request: Request, book_id: int, db: Session = Depends(get_db)):
     """
-    Verifica se um livro está disponível para empréstimo.
+    Checks if a book is available for loan.
     """
     service = BookService()
     book = service.get_book(db, book_id=book_id)

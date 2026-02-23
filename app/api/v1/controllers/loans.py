@@ -13,10 +13,10 @@ router = APIRouter()
 @limiter.limit("10/minute")
 def create_loan(request: Request, loan: LoanCreate, db: Session = Depends(get_db)):
     """
-    Realiza o empréstimo de um livro.
-    - O prazo padrão fica salvo na Model (14 dias do registro).
-    - O livro precisa ser válido e estar `is_available = True`.
-    - O Usuário não pode ter 3 empréstimos ATIVOS simultaneamente.
+    Performs a book loan.
+    - Default deadline is saved in the Model (14 days from registry).
+    - Book must be valid and have `is_available = True`.
+    - User cannot have 3 ACTIVE loans simultaneously.
     """
     return loan_service.create_loan(db=db, loan=loan)
 
@@ -24,9 +24,9 @@ def create_loan(request: Request, loan: LoanCreate, db: Session = Depends(get_db
 @limiter.limit("10/minute")
 def return_loan(request: Request, loan_id: int, db: Session = Depends(get_db)):
     """
-    Processa a devolução de um empréstimo.
-    - Calcula automaticamente a multa (se houver) de acordo com R$ 2,00/dia.
-    - Libera o `is_available` do Livro em questão.
+    Processes a loan return.
+    - Automatically calculates the fine (if any) at R$ 2.00/day.
+    - Releases the book's `is_available` status.
     """
     return loan_service.return_loan(db=db, loan_id=loan_id)
 
@@ -34,6 +34,6 @@ def return_loan(request: Request, loan_id: int, db: Session = Depends(get_db)):
 @limiter.limit("20/minute")
 def read_active_or_delayed_loans(request: Request, skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
-    Lista todos os empréstimos ativos (em prazo) ou atrasados (vencidos ainda não devolvidos) do sistema global.
+    Lists all active (within deadline) or delayed (overdue and not returned) loans system-wide.
     """
     return loan_service.get_active_or_delayed_loans(db, skip=skip, limit=limit)
