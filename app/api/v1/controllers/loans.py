@@ -2,16 +2,22 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from app.domain.dtos.loan import LoanCreate, LoanResponse
-from app.api.dependencies import get_db
+from app.domain.dtos.loan import LoanCreate, LoanResponse, ReturnResponse
+from app.api.dependencies import get_db, get_current_user
 from app.services.loan_service import loan_service
+from app.domain.entities.user import User
 from app.core.rate_limit import limiter
 
 router = APIRouter()
 
 @router.post("/", response_model=LoanResponse)
-@limiter.limit("10/minute")
-def create_loan(request: Request, loan: LoanCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def create_loan(
+    request: Request, 
+    loan: LoanCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
     Performs a book loan.
     - Default deadline is saved in the Model (14 days from registry).
@@ -20,9 +26,14 @@ def create_loan(request: Request, loan: LoanCreate, db: Session = Depends(get_db
     """
     return loan_service.create_loan(db=db, loan=loan)
 
-@router.post("/{loan_id}/return", response_model=LoanResponse)
-@limiter.limit("10/minute")
-def return_loan(request: Request, loan_id: int, db: Session = Depends(get_db)):
+@router.post("/{loan_id}/return", response_model=ReturnResponse)
+@limiter.limit("5/minute")
+def return_loan(
+    request: Request, 
+    loan_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
     Processes a loan return.
     - Automatically calculates the fine (if any) at R$ 2.00/day.

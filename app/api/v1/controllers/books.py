@@ -4,15 +4,21 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.domain.dtos.book import BookCreate, BookResponse, AuthorCreate, AuthorResponse
-from app.api.dependencies import get_db, get_redis_client
+from app.api.dependencies import get_db, get_current_user, get_redis_client
+from app.domain.entities.user import User
 from app.core.rate_limit import limiter
 from app.services.book_service import BookService
 
 router = APIRouter()
 
 @router.post("/authors/", response_model=AuthorResponse)
-@limiter.limit("10/minute")
-def create_author(request: Request, author: AuthorCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def create_author(
+    request: Request, 
+    author: AuthorCreate, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
     Registers a new author.
     """
@@ -30,8 +36,14 @@ def read_authors(request: Request, skip: int = 0, limit: int = 10, db: Session =
     return service.get_authors(db, skip=skip, limit=limit)
 
 @router.post("/", response_model=BookResponse)
-@limiter.limit("10/minute")
-def create_book(request: Request, book: BookCreate, db: Session = Depends(get_db), redis_client = Depends(get_redis_client)):
+@limiter.limit("5/minute")
+def create_book(
+    request: Request, 
+    book: BookCreate, 
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user),
+    redis_client: Optional[redis.Redis] = Depends(get_redis_client)
+):
     """
     Registers a new book linked to an existing author. CLEARS the book list CACHE.
     """

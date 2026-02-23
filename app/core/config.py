@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     MAX_ACTIVE_LOANS_PER_USER: int = 3
     LATE_FEE_PER_DAY: float = 2.0
 
+    # Security
+    SECRET_KEY: str = "your-super-secret-key-change-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8 # 8 days
+
     model_config = {
         "env_file": ".env",
         "extra": "ignore"
