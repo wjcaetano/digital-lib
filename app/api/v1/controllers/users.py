@@ -8,7 +8,6 @@ from app.services.user_service import user_service
 from app.services.loan_service import loan_service
 from app.domain.dtos.loan import LoanResponse
 from app.core.rate_limit import limiter
-from app.domain.dtos.loan import LoanResponse
 
 router = APIRouter()
 
