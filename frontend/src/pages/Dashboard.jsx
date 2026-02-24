@@ -25,7 +25,7 @@ const Dashboard = () => {
                 ]);
 
                 const active = loans.filter(l => l.status === 'ACTIVE').length;
-                const delayed = loans.filter(l => l.status === 'DELAYED').length;
+                const delayed = loans.filter(l => l.status === 'OVERDUE').length;
 
                 setStats({
                     totalBooks: books.length,

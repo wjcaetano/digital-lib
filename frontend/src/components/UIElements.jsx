@@ -1,8 +1,8 @@
 import './Card.css';
 
-export const Card = ({ children, className = '' }) => {
+export const Card = ({ children, className = '', style }) => {
     return (
-        <div className={`premium-card animate-fade-in ${className}`}>
+        <div className={`premium-card animate-fade-in ${className}`} style={style}>
             {children}
         </div>
     );
@@ -15,6 +15,7 @@ export const Badge = ({ status }) => {
             case 'active':
             case 'returned':
                 return 'badge-success';
+            case 'overdue':
             case 'delayed':
             case 'unavailable':
                 return 'badge-danger';
