@@ -58,9 +58,25 @@ The application handles 3 core entities (`User`, `Book`, `Loan`) managed through
    ```
 
 5. **Access the Application**:
-   - **Frontend (React SPA)**: Open `http://localhost:5173/` in your browser.
-     *To use the application, you must first create a user via the Swagger API.*
    - **Backend Documentation (Swagger)**: Open `http://localhost:8000/docs`.
+     
+     **How to create your first user via Swagger:**
+     1. In the Swagger UI, scroll down to the `users` section.
+     2. Click on the green `POST /api/v1/users/` endpoint row to expand it.
+     3. Click the **"Try it out"** button in the top right corner of the expanded section.
+     4. In the Request body area, modify the JSON to include your desired credentials. Example:
+        ```json
+        {
+          "name": "Admin User",
+          "email": "admin@digital-lib.com",
+          "password": "securepassword123"
+        }
+        ```
+     5. Click the large blue **"Execute"** button below the request body.
+     6. Scroll down to the "Responses" section to verify you received a `200` Code.
+
+   - **Frontend (React SPA)**: Open `http://localhost:5173/` in your browser.
+     *Use the email and password you just created in the step above to log into the frontend.*
 
 ## Running Tests (QA - Internal Validation)
 You can run all the application tests by executing:
