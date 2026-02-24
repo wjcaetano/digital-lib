@@ -41,27 +41,42 @@ class BookService:
 
     def get_books(self, db: Session, skip: int = 0, limit: int = 100) -> List[Book]:
         cache_key = f"{self.CACHE_KEY_PREFIX}:{skip}:{limit}"
-        
+
         if self.redis_client:
-            cached_books = self.redis_client.get(cache_key)
-            if cached_books:
-                books_data = json.loads(cached_books)
-                return [Book(**data) for data in books_data]
-                
+            cached = self.redis_client.get(cache_key)
+            if cached:
+                books_data = json.loads(cached)
+                books = []
+                for data in books_data:
+                    author_data = data.pop("author", None)
+                    book = Book(**data)
+                    if author_data:
+                        from app.domain.entities.book import Author
+                        book.author = Author(**author_data)
+                    books.append(book)
+                return books
+
         books = book_repository.get_multi(db, skip=skip, limit=limit)
-        
+
         if self.redis_client:
             books_dict = [
                 {
-                    "id": b.id, 
-                    "title": b.title, 
-                    "isbn": b.isbn, 
+                    "id": b.id,
+                    "title": b.title,
+                    "isbn": b.isbn,
                     "is_available": b.is_available,
-                    "author_id": b.author_id
-                } for b in books
+                    "author_id": b.author_id,
+                    "created_at": b.created_at.isoformat() if b.created_at else None,
+                    "author": {
+                        "id": b.author.id,
+                        "name": b.author.name,
+                        "created_at": b.author.created_at.isoformat() if b.author.created_at else None,
+                    } if b.author else None,
+                }
+                for b in books
             ]
             self.redis_client.setex(cache_key, 3600, json.dumps(books_dict))
-            
+
         return books
 
     def get_book(self, db: Session, book_id: int) -> Optional[Book]:

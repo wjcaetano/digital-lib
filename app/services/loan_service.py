@@ -17,6 +17,8 @@ class LoanService:
         return loan_repository.get_multi(db, skip=skip, limit=limit)
 
     def get_active_or_delayed_loans(self, db: Session, skip: int = 0, limit: int = 100) -> List[Loan]:
+        # Mark overdue loans before returning the list
+        loan_repository.mark_overdue_loans(db)
         return loan_repository.get_all_active_or_delayed(db, skip=skip, limit=limit)
 
     def get_user_loans(self, db: Session, user_id: int, skip: int = 0, limit: int = 100) -> List[Loan]:
@@ -68,9 +70,9 @@ class LoanService:
             
         # Update Loan Status & Apply Fine
         updated_loan = loan_repository.update(db, db_obj=loan, obj_in_data={
-            "returned_at": datetime.utcnow(),
+            "return_date": datetime.utcnow(),
             "status": LoanStatus.RETURNED,
-            "fine_amount": max(0.0, fine_amount)
+            "late_fee": max(0.0, fine_amount)
         })
 
         # Make Book Available Again
